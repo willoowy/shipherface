@@ -2,7 +2,7 @@
 #include "ctime"
 #include "cmath"
 #include "cstdlib"
-
+#include "string"
 using namespace System;
 using namespace System::Windows::Forms;
 using namespace System::ComponentModel;

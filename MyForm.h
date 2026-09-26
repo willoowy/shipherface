@@ -12,6 +12,7 @@
 
 namespace shipherface {
 
+	using namespace std;
 	using namespace System;
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
@@ -93,6 +94,25 @@ namespace shipherface {
 			return keys;
 		}
 
+		string To_str(string& bits) {
+			string s;
+			int len = bits.size();
+			for (int i = 0; i < bits.size(); i += 8) {
+				int num = 0;
+				for (size_t j = 0; j <= 7; j++)
+				{
+					num += ((bits[i + j] - '0') * (pow(2, 7 - j)));
+
+
+				}
+				s.push_back(static_cast<char>(num));
+
+			}
+			return s;
+
+		}
+
+
 		// Возвращаем весь лог в std::string (чтобы показать в GUI)
 		std::string spnEncryptLog(const std::string& pt, const std::vector<std::string>& keys,
 			int rounds, const std::array<int, 16>& sbox, const std::vector<int>& pbox)
@@ -145,6 +165,7 @@ namespace shipherface {
 			return bits;
 		}
 	}
+		
 
 	/// <summary>
 	/// Сводка для MyForm
@@ -181,7 +202,7 @@ namespace shipherface {
 			// 
 			// button1
 			// 
-			this->button1->Location = System::Drawing::Point(559, 350);
+			this->button1->Location = System::Drawing::Point(499, 351);
 			this->button1->Name = L"button1";
 			this->button1->Size = System::Drawing::Size(120, 40);
 			this->button1->TabIndex = 0;
@@ -192,7 +213,7 @@ namespace shipherface {
 			// label1
 			// 
 			this->label1->AutoSize = true;
-			this->label1->Location = System::Drawing::Point(309, 157);
+			this->label1->Location = System::Drawing::Point(90, 47);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(44, 16);
 			this->label1->TabIndex = 1;
@@ -250,15 +271,22 @@ namespace shipherface {
 		System::String^ outText = msclr::interop::marshal_as<System::String^>(encryptLog);
 		this->label1->Text = outText;
 
+
+
 		// Спросим пользователя — расшифровать ли
 		auto res = MessageBox::Show("Выполнить расшифровку?", "SPN", MessageBoxButtons::YesNo, MessageBoxIcon::Question);
 		if (res == System::Windows::Forms::DialogResult::Yes) {
 			std::string decryptLog = spnDecryptLog(cipherBits, roundKeys, rounds, invS, invP);
 			System::String^ decText = msclr::interop::marshal_as<System::String^>(decryptLog);
+
+
+
+
 			// Покажем лог расшифровки
 			this->label1->Text = decText;
 			// Также уведомим, совпало ли восстановленное состояние с исходным
 			std::string recoveredBits = extractBits(decryptLog, "RECOVERED_BITS:", 64);
+			this->label1->Text += "Расшифрованный текст:   " + msclr::interop::marshal_as<System::String^>(To_str(recoveredBits));
 			if (recoveredBits.size() != 64) {
 				MessageBox::Show("Не удалось корректно извлечь восстановленные биты.", "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
 				return;
